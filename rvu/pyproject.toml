@@ -1,0 +1,64 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "rvu"
+version = "0.1.0"
+description = "Recursive Verified Unlearning reference implementation"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = []
+
+[project.optional-dependencies]
+bench = [
+  "faiss-cpu>=1.8.0",
+  "sentence-transformers>=3.0.0",
+  "transformers>=4.44.0",
+  "torch>=2.3.0",
+  "openai>=1.40.0",
+]
+
+dev = [
+  "black>=24.0",
+  "ruff>=0.6.0",
+  "mypy>=1.11.0",
+  "pytest>=8.0.0",
+  "hypothesis>=6.110.0",
+  "pre-commit>=3.8.0",
+]
+
+[tool.setuptools]
+package-dir = {"" = "."}
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["rvu*"]
+
+[tool.black]
+line-length = 100
+target-version = ["py311"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "N", "W"]
+ignore = ["E501", "UP017"]
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+warn_unused_configs = true
+exclude = ["^tests/"]
+
+[tool.pytest.ini_options]
+markers = [
+  "regression: regression tests for stable traces",
+  "bench_smoke: canonical benchmark smoke tests",
+  "bench_full: canonical benchmark full-run tests",
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/test_property_based_graphs.py" = ["E402", "I001"]
