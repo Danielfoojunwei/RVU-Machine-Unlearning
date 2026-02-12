@@ -14,10 +14,11 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
-      - run: pip install -e .[dev]
-      - run: ruff check rvu tests
-      - run: black --check rvu tests
+          python-version: "3.11"
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install -e .[dev]
+      - run: ruff check rvu tests scripts
+      - run: black --check rvu tests scripts
       - run: mypy rvu
-      - run: pytest -q
-      - run: pytest -q -m regression
+      - run: python -m pytest -q
+      - run: python -m pytest -q -m regression
