@@ -1,0 +1,8 @@
+[
+  "MEMORY_WRITE:memory",
+  "FILE_WRITE:sandbox/notes.txt",
+  "MEMORY_WRITE:memory",
+  "FILE_WRITE:sandbox/notes.txt",
+  "MEMORY_WRITE:memory",
+  "FILE_WRITE:sandbox/notes.txt"
+]
