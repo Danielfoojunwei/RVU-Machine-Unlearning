@@ -1,0 +1,15 @@
+{
+  "output_root": "artifacts/runs",
+  "sandbox_root": "artifacts/sandbox",
+  "run_agentdojo": true,
+  "run_injecagent": true,
+  "run_bipia": true,
+  "model": {
+    "provider": "vllm",
+    "model_id": "Qwen/Qwen2.5-7B-Instruct",
+    "revision": "main",
+    "endpoint": "http://127.0.0.1:8000/v1",
+    "dtype": "bfloat16",
+    "max_tokens": 512
+  }
+}
