@@ -1,0 +1,7 @@
+{
+  "results": [
+    {"name": "agentdojo", "utility": 0.60, "asr": 0.20, "latency_s": 1.2, "certificate_pass_rate": 1.0},
+    {"name": "injecagent", "utility": 0.55, "asr": 0.18, "latency_s": 1.6, "certificate_pass_rate": 1.0},
+    {"name": "bipia", "utility": 0.58, "asr": 0.19, "latency_s": 1.5, "certificate_pass_rate": 1.0}
+  ]
+}
