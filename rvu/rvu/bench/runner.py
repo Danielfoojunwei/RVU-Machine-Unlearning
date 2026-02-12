@@ -4,7 +4,7 @@ import json
 import platform
 import subprocess
 from dataclasses import asdict
-from datetime import UTC, datetime
+from datetime import datetime, timezone
 from pathlib import Path
 
 from .benchmarks import BenchmarkCommand, BenchmarkResult, run_command
@@ -13,15 +13,18 @@ from .config import BenchConfig, RunMetadata
 
 def collect_metadata() -> RunMetadata:
     commit = subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip()
-    gpu_name = subprocess.check_output(
-        ["nvidia-smi", "--query-gpu=name", "--format=csv,noheader"],
-        text=True,
-    ).splitlines()[0]
+    try:
+        gpu_name = subprocess.check_output(
+            ["nvidia-smi", "--query-gpu=name", "--format=csv,noheader"],
+            text=True,
+        ).splitlines()[0]
+    except (FileNotFoundError, subprocess.CalledProcessError):
+        gpu_name = "unavailable"
     return RunMetadata(commit_hash=commit, gpu_name=gpu_name, machine=platform.platform())
 
 
 def run_benchmarks(config: BenchConfig, smoke: bool) -> Path:
-    run_dir = config.output_root / datetime.now(UTC).strftime("%Y%m%d-%H%M%S")
+    run_dir = config.output_root / datetime.now(timezone.utc).strftime("%Y%m%d-%H%M%S")
     run_dir.mkdir(parents=True, exist_ok=True)
     metadata = collect_metadata()
 

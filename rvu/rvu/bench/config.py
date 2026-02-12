@@ -1,9 +1,8 @@
 from __future__ import annotations
 
+import json
 from dataclasses import dataclass
 from pathlib import Path
-
-import yaml  # type: ignore[import-untyped]
 
 
 @dataclass(frozen=True)
@@ -34,7 +33,7 @@ class RunMetadata:
 
 
 def load_config(path: Path) -> BenchConfig:
-    raw = yaml.safe_load(path.read_text())
+    raw = json.loads(path.read_text(encoding="utf-8"))
     model_raw = raw["model"]
     return BenchConfig(
         output_root=Path(raw["output_root"]),

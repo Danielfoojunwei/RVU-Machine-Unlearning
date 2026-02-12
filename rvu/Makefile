@@ -8,14 +8,14 @@ typecheck:
 	mypy rvu
 
 test:
-	pytest -q
+	python -m pytest -q
 
 regression:
-	pytest -q -m regression
+	python -m pytest -q -m regression
 
 bench_smoke:
-	pytest -q -m bench_smoke
-	python -m rvu.qa.run_benchmarks --config docker/bench.config.yaml --smoke
+	python -m pytest -q -m bench_smoke
+	python -m rvu.qa.run_benchmarks --config docker/bench.config.json --smoke
 
 bench_agentdojo_full:
 	python -m rvu.qa.benchmark_agentdojo --mode full --out artifacts/runs/manual
@@ -31,10 +31,6 @@ report:
 
 audit-demo:
 	python -m rvu.qa.scenarios run_incident --scenario doc_poison --out artifacts
-	python - <<'PY'
-import json
-from pathlib import Path
-Path('artifacts/K.json').write_text(json.dumps(['a-00000001']))
-PY
+	python -c "import json;from pathlib import Path;Path('artifacts/K.json').write_text(json.dumps(['a-00000001']))"
 	python -m rvu.rvu_core.operator run --log artifacts/log.jsonl --K artifacts/K.json --out artifacts/cert.json
 	python -m rvu.rvu_core.auditor verify --cert artifacts/cert.json --log artifacts/log.jsonl --K '["a-00000001"]'
