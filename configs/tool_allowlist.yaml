@@ -1,0 +1,37 @@
+# tool_allowlist.yaml – Allowed tool scopes for RVG/RVU gating
+
+# Each tool category lists the operations that are permitted.
+# The verifier checks every tool call against this allowlist before execution.
+
+allowed_tools:
+  filesystem:
+    - read_file
+    - list_directory
+    - search_files
+
+  web:
+    - http_get
+    - web_search
+
+  email:
+    - read_email
+    - list_emails
+
+  calendar:
+    - read_events
+    - list_events
+
+  database:
+    - select_query
+
+# Blocked patterns: tool calls matching these are always rejected.
+blocked_patterns:
+  - "rm -rf"
+  - "DROP TABLE"
+  - "DELETE FROM"
+  - "send_email"
+  - "execute_code"
+  - "shell_exec"
+  - "http_post"
+  - "http_put"
+  - "http_delete"

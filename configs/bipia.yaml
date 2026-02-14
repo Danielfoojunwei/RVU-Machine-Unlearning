@@ -1,0 +1,39 @@
+# bipia.yaml – BIPIA benchmark configuration
+
+benchmark: "BIPIA"
+source: "https://github.com/microsoft/BIPIA"
+
+smoke:
+  description: "emailQA subset for CI regression"
+  subsets:
+    - "email"
+  max_samples: 30
+
+full:
+  description: "All BIPIA subsets"
+  subsets:
+    - "email"
+    - "qa"
+    - "table"
+    - "code"
+    - "abstract"
+
+defenses:
+  - vanilla
+  - promptguard
+  - rvg
+  - rvu
+
+metrics:
+  - robustness_rate
+  - attack_success_rate
+  - utility_score
+  - mean_tokens
+  - mean_wall_time_s
+  - certificates_generated  # RVU only
+  - auditor_pass_rate        # RVU only
+
+logging:
+  format: "jsonl"
+  per_episode: true
+  include_traces: true

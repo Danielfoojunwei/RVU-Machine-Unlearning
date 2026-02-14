@@ -1,0 +1,54 @@
+# defenses.yaml – Defense configuration for all baselines and RVU
+
+defenses:
+  vanilla:
+    description: "Standard ReAct/tool agent prompt; no defense applied."
+    module: "rvu.defenses.vanilla"
+    class: "VanillaDefense"
+    params: {}
+
+  promptguard:
+    description: >
+      Filter untrusted external content (webpage/email/tool outputs) using
+      meta-llama/Llama-Prompt-Guard-2-86M before the agent sees it.
+    module: "rvu.defenses.promptguard_defense"
+    class: "PromptGuardDefense"
+    params:
+      threshold: 0.85
+      action: "strip"   # strip | block | flag
+
+  fath:
+    description: >
+      FATH (Formatting + Authentication Tags + Hash) defense from official code.
+      Applies authentication-based test-time defense with hash verification.
+    module: "rvu.defenses.fath_adapter"
+    class: "FATHDefense"
+    params:
+      hash_algorithm: "sha256"
+      tag_format: "bracket"   # bracket | xml
+
+  rvg:
+    description: >
+      RVG-only: Verifier-gated tool boundary with scope allowlists and
+      provenance-taint rules. No unlearning operator.
+    module: "rvu.defenses.rvg_only"
+    class: "RVGOnlyDefense"
+    params:
+      allowlist_path: "configs/tool_allowlist.yaml"
+      taint_propagation: true
+
+  rvu:
+    description: >
+      Full RVU: Recovery-based Verifiable Unlearning. Provenance tracking over
+      memory DB (SQLite), retrieval store (FAISS CPU), and tool I/O logs.
+      Includes contamination detection, provenance closure, purge/rollback,
+      certificate emission, and auditor verification.
+    module: "rvu.defenses.rvu"
+    class: "RVUDefense"
+    params:
+      db_path: "artifacts/rvu_provenance.db"
+      faiss_index_path: "artifacts/rvu_faiss.index"
+      embedding_model: "bge_small"
+      certificate_dir: "artifacts/certificates"
+      replay_epsilon: 0.05
+      closure_max_depth: 10
