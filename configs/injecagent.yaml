@@ -1,0 +1,60 @@
+# injecagent.yaml – InjecAgent benchmark configuration
+
+benchmark: "InjecAgent"
+source: "https://github.com/uiuc-kang-lab/InjecAgent"
+
+smoke:
+  description: "25 fixed test cases for CI regression"
+  case_ids:
+    - 1
+    - 10
+    - 25
+    - 50
+    - 75
+    - 100
+    - 150
+    - 200
+    - 250
+    - 300
+    - 350
+    - 400
+    - 450
+    - 500
+    - 550
+    - 600
+    - 650
+    - 700
+    - 750
+    - 800
+    - 850
+    - 900
+    - 950
+    - 1000
+    - 1054
+
+full:
+  description: "All 1,054 test cases"
+  total_cases: 1054
+
+defenses:
+  - vanilla
+  - promptguard
+  - fath
+  - rvg
+  - rvu
+
+metrics:
+  - attack_success_rate     # ASR
+  - attack_success_by_tool_category
+  - attack_success_by_attack_type
+  - utility_success_rate
+  - mean_steps
+  - mean_tokens
+  - mean_wall_time_s
+  - certificates_generated  # RVU only
+  - auditor_pass_rate        # RVU only
+
+logging:
+  format: "jsonl"
+  per_episode: true
+  include_traces: true

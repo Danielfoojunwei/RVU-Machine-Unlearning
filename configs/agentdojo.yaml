@@ -1,0 +1,38 @@
+# agentdojo.yaml – AgentDojo benchmark configuration
+
+benchmark: "agentdojo-inspect"
+source: "https://github.com/usnistgov/agentdojo-inspect"
+
+smoke:
+  description: "Small canonical subset for CI regression"
+  suites:
+    - name: "workspace"
+      user_task_ids: [0, 1, 2]
+      injection_task_ids: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+full:
+  description: "Complete default suites for paper figures"
+  suites:
+    - name: "all"
+      comment: "Run every suite with every injection; see AgentDojo docs"
+
+defenses:
+  - vanilla
+  - promptguard
+  - rvg
+  - rvu
+
+metrics:
+  - utility_success_rate
+  - attack_success_rate
+  - violation_rate
+  - mean_steps
+  - mean_tokens
+  - mean_wall_time_s
+  - certificates_generated   # RVU only
+  - auditor_pass_rate         # RVU only
+
+logging:
+  format: "jsonl"
+  per_episode: true
+  include_traces: true

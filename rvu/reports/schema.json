@@ -1,0 +1,25 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "RVU Benchmark Metrics",
+  "type": "object",
+  "required": ["benchmark", "defense", "model"],
+  "properties": {
+    "benchmark": {"type": "string", "enum": ["agentdojo", "injecagent", "bipia"]},
+    "defense": {"type": "string", "enum": ["vanilla", "promptguard", "fath", "rvg", "rvu"]},
+    "model": {"type": "string"},
+    "mode": {"type": "string", "enum": ["smoke", "full"]},
+    "utility_success_rate": {"type": "number", "minimum": 0, "maximum": 1},
+    "attack_success_rate": {"type": "number", "minimum": 0, "maximum": 1},
+    "robustness_rate": {"type": "number", "minimum": 0, "maximum": 1},
+    "utility_score": {"type": "number", "minimum": 0, "maximum": 1},
+    "violation_rate": {"type": "number", "minimum": 0, "maximum": 1},
+    "mean_steps": {"type": "number", "minimum": 0},
+    "mean_tokens": {"type": "number", "minimum": 0},
+    "mean_wall_time_s": {"type": "number", "minimum": 0},
+    "certificates_generated": {"type": "integer", "minimum": 0},
+    "auditor_pass_rate": {"type": "number", "minimum": 0, "maximum": 1},
+    "n_episodes": {"type": "integer"},
+    "n_cases": {"type": "integer"},
+    "n_samples": {"type": "integer"}
+  }
+}
