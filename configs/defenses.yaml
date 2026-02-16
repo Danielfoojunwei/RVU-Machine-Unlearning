@@ -14,6 +14,7 @@ defenses:
     module: "rvu.defenses.promptguard_defense"
     class: "PromptGuardDefense"
     params:
+      model_path: "models/guard/prompt-guard-2-86m"
       threshold: 0.85
       action: "strip"   # strip | block | flag
 
@@ -23,9 +24,7 @@ defenses:
       Applies authentication-based test-time defense with hash verification.
     module: "rvu.defenses.fath_adapter"
     class: "FATHDefense"
-    params:
-      hash_algorithm: "sha256"
-      tag_format: "bracket"   # bracket | xml
+    params: {}  # Uses randomly generated secret_key by default
 
   rvg:
     description: >
@@ -48,7 +47,8 @@ defenses:
     params:
       db_path: "artifacts/rvu_provenance.db"
       faiss_index_path: "artifacts/rvu_faiss.index"
-      embedding_model: "bge_small"
+      embedding_model_path: "models/embed/bge-small-en-v1.5"
+      allowlist_path: "configs/tool_allowlist.yaml"
       certificate_dir: "artifacts/certificates"
-      replay_epsilon: 0.05
+      similarity_threshold: 0.85
       closure_max_depth: 10
