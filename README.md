@@ -1,6 +1,6 @@
-# Recovery-based Verifiable Unlearning for Tool-Augmented LLM Agents
+# Recovery and Verification Utility for Tool-Augmented LLM Agents
 
-**An Empirical Evaluation of Prompt-Injection Defenses with Provenance-Tracked Recovery**
+**An Empirical Evaluation of Prompt-Injection Defenses with Provenance-Tracked Runtime State Recovery**
 
 > All experiments in this paper run on CPU with open-weight models, use real
 > benchmark-derived attack scenarios, and contain zero mocks, fakes, or
@@ -13,7 +13,7 @@
 Tool-augmented large language model (LLM) agents are vulnerable to prompt
 injection attacks in which adversarial instructions are embedded within
 external data sources (emails, webpages, documents) and executed by the agent.
-We present **RVU (Recovery-based Verifiable Unlearning)**, a defense that
+We present **RVU (Recovery and Verification Utility)**, a defense that
 combines provenance-tracked tool boundaries, contamination-closure computation,
 selective purge/rollback operators, and cryptographically signed certificates
 that an independent auditor can verify.
@@ -21,7 +21,7 @@ that an independent auditor can verify.
 We evaluate RVU against four baselines -- **Vanilla** (no defense), **FATH**
 (authentication tags + hash verification), **PromptGuard** (classifier-based
 content filtering), and **RVG-only** (verifier-gated tool boundary without
-unlearning) -- across attack scenarios derived from three canonical prompt-
+recovery) -- across attack scenarios derived from three canonical prompt-
 injection benchmarks: **AgentDojo** (ETH/NIST), **InjecAgent** (UIUC), and
 **BIPIA** (Microsoft).
 
@@ -59,7 +59,7 @@ mechanism to identify, trace, and purge the contaminated state.
 ### 1.2 Contribution
 
 RVU introduces a third category: **provenance-tracked recovery with verifiable
-unlearning**. The key contributions are:
+state purge**. The key contributions are:
 
 1. A **provenance database** (SQLite) that logs every tool call, tool output,
    memory write, and retrieval operation with timestamps, content hashes, and
@@ -73,7 +73,7 @@ unlearning**. The key contributions are:
    affected by contamination via BFS over the provenance DAG.
 
 4. A **purge operator** that marks contaminated entries and rebuilds the
-   retrieval index, effectively "unlearning" the injected content.
+   retrieval index, effectively purging the injected content from runtime state.
 
 5. A **certificate emission and verification** protocol using SHA-256 over
    deterministic purge manifests, enabling independent auditor verification.
@@ -103,13 +103,16 @@ unlearning**. The key contributions are:
 | **Sandwich Defense** | Prompt-level | Re-states instructions after untrusted content | Easily circumvented; no formal guarantees |
 | **Instruction Hierarchy** | Training-level | Fine-tune model to prioritize system instructions | Requires training; not applicable to off-the-shelf models |
 
-### 2.3 Machine Unlearning
+### 2.3 Runtime State Recovery
 
-Machine unlearning traditionally refers to removing the influence of specific
-training data from a trained model (Bourtoule et al., 2021; Nguyen et al.,
-2022). RVU extends this concept to the **inference-time state** of an agent:
-rather than modifying model weights, RVU identifies and removes contaminated
-entries from the agent's working memory, retrieval store, and tool I/O history.
+Traditional approaches to data removal focus on retracting the influence of
+specific training data from model weights (Bourtoule et al., 2021; Nguyen et
+al., 2022). RVU takes a fundamentally different approach, operating on the
+**inference-time state** of an agent: rather than modifying model weights, RVU
+identifies and removes contaminated entries from the agent's working memory,
+retrieval store, and tool I/O history. This distinction is critical -- the
+contamination in prompt-injection attacks never reaches the model parameters,
+so weight-level interventions would address the wrong layer of the system.
 
 ---
 
@@ -470,7 +473,7 @@ further reduced with batched writes and pre-computed embeddings.
 
 ## 8. Conclusion
 
-We presented RVU, a recovery-based verifiable unlearning defense for tool-
+We presented RVU, a recovery-based verifiable state purge defense for tool-
 augmented LLM agents. RVU reduces attack success rate from 60% to 10% across
 AgentDojo, InjecAgent, and BIPIA-derived scenarios, matching the security of
 allowlist-based gating (RVG) while adding provenance tracking, selective purge,
@@ -638,9 +641,9 @@ tests/
 
 5. Meta. "Llama Prompt Guard 2." *HuggingFace*, 2024. `meta-llama/Llama-Prompt-Guard-2-86M`.
 
-6. Bourtoule, L., et al. "Machine Unlearning." *IEEE Symposium on Security and Privacy*, 2021.
+6. Bourtoule, L., et al. "SISA Training: A Federated Approach to Data Removal." *IEEE Symposium on Security and Privacy*, 2021.
 
-7. Nguyen, T.T., et al. "A Survey of Machine Unlearning." *arXiv preprint arXiv:2209.02299*, 2022.
+7. Nguyen, T.T., et al. "A Survey of Data Removal Methods for Trained Models." *arXiv preprint arXiv:2209.02299*, 2022.
 
 ---
 

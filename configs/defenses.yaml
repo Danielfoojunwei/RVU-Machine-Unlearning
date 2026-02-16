@@ -30,7 +30,7 @@ defenses:
   rvg:
     description: >
       RVG-only: Verifier-gated tool boundary with scope allowlists and
-      provenance-taint rules. No unlearning operator.
+      provenance-taint rules. No state recovery operator.
     module: "rvu.defenses.rvg_only"
     class: "RVGOnlyDefense"
     params:
@@ -39,7 +39,7 @@ defenses:
 
   rvu:
     description: >
-      Full RVU: Recovery-based Verifiable Unlearning. Provenance tracking over
+      Full RVU: Recovery and Verification Utility. Provenance tracking over
       memory DB (SQLite), retrieval store (FAISS CPU), and tool I/O logs.
       Includes contamination detection, provenance closure, purge/rollback,
       certificate emission, and auditor verification.

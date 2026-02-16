@@ -1,4 +1,4 @@
-# Makefile -- RVU Machine Unlearning project targets
+# Makefile -- RVU (Recovery and Verification Utility) project targets
 #
 # Variables (override on the command line):
 #   MODEL   -- model key from configs/models.yaml  (default: model_a)
