@@ -1,0 +1,151 @@
+# adapters.yaml — Adapter safety policy, risk thresholds, and benchmark config
+#
+# Theoretical grounding:
+#   - FROC risk weights: NTU DTC ICAIIC 2026
+#   - Tiered thresholds: Corollary 3.1 (Threshold Ordering)
+#   - Safety projection: Safe LoRA (Hsu et al., NeurIPS 2024)
+#   - OOD detection: OOO (Liu et al., 2024) Mahalanobis distance
+#   - Adapter types: LoRA (linear), IA3/Prefix (non-linear), QLoRA (quantized)
+
+# ============================================================================
+# Adapter Loading Policy
+# ============================================================================
+adapter_policy:
+  allow_sources:
+    - "local"
+    - "huggingface"
+  blocked_repos:
+    - "malicious-user/*"
+  blocked_hashes: []
+  require_hash_verification: true
+  max_concurrent_adapters: 4
+
+  # Supported adapter architectures.
+  # Both linear (LoRA, DoRA) and non-linear (IA3, prefix-tuning,
+  # prompt-tuning, adapter-bottleneck) are tracked.
+  supported_adapter_types:
+    linear:
+      - "lora"          # Low-Rank Adaptation (Hu et al., 2021)
+      - "dora"          # Weight-Decomposed Low-Rank Adaptation
+      - "adalora"       # Adaptive LoRA with importance scoring
+      - "qlora"         # Quantized LoRA (Dettmers et al., 2023)
+    non_linear:
+      - "ia3"           # Infused Adapter by Inhibiting and Amplifying
+      - "prefix_tuning" # Prefix-Tuning (Li & Liang, 2021)
+      - "prompt_tuning" # Prompt Tuning (Lester et al., 2021)
+      - "bottleneck"    # Adapter bottleneck (Houlsby et al., 2019)
+      - "lora_plus"     # LoRA+ with non-linear activation
+
+# ============================================================================
+# Safety Projection (Safe LoRA, NeurIPS 2024)
+# ============================================================================
+safety_projection:
+  enabled: true
+  method: "safe_lora"           # safe_lora | salora | none
+
+  # For linear adapters (LoRA/DoRA): project ΔW onto safety subspace.
+  # safety_score = ||proj_S(ΔW)||_F / ||ΔW||_F
+  linear:
+    safety_subspace_dim: 64
+    rejection_threshold: 0.15   # Reject if safety_score < this
+
+  # For non-linear adapters (IA3/Prefix): measure activation norm shift.
+  # Non-linear adapters don't have a simple weight delta, so we measure
+  # the norm of learned parameters relative to the base model's norms.
+  # activation_ratio = ||adapter_params||_F / ||base_layer_params||_F
+  non_linear:
+    activation_ratio_threshold: 0.30   # Reject if ratio > this
+    prefix_length_limit: 100           # Max prefix tokens allowed
+
+# ============================================================================
+# OOD Detection (OOO, arXiv 2407.10223)
+# ============================================================================
+ood_detection:
+  enabled: true
+  method: "mahalanobis"         # mahalanobis | energy | none
+  calibration_samples: 500
+  threshold: 3.0                # Mahalanobis distance threshold
+
+  # Calibration prompt sources for OOD baseline.
+  calibration_datasets:
+    - name: "safe_rlhf_calibration"
+      source: "PKU-Alignment/PKU-SafeRLHF"
+      split: "train"
+      sample_size: 500
+    - name: "alpaca_calibration"
+      source: "tatsu-lab/alpaca"
+      split: "train"
+      sample_size: 500
+
+# ============================================================================
+# FROC Risk Function (NTU DTC, ICAIIC 2026)
+#
+# R(e) = w_c * P(contaminated|e) + w_i * I(e) + w_p * |C({e})| / |V|
+#
+# Theorem 3 (Risk Monotonicity): R is monotonically non-decreasing in
+# each component.
+# Corollary 3.1 (Threshold Ordering): flag < quarantine < purge < evict
+# ============================================================================
+risk_thresholds:
+  # Weights for the FROC risk function (must sum to 1.0).
+  w_contamination: 0.4
+  w_influence: 0.3
+  w_propagation: 0.3
+
+  # Tiered response thresholds (Corollary 3.1 ordering).
+  flag_threshold: 0.3       # [0.0, 0.3): no action
+  quarantine_threshold: 0.6  # [0.3, 0.6): quarantine (reversible)
+  purge_threshold: 0.8       # [0.6, 0.8): purge entries
+  evict_threshold: 0.9       # [0.8, 1.0]: purge + evict adapter
+
+# ============================================================================
+# Membership Probe (NeurIPS 2025 + NTU DTC Threats Survey)
+# ============================================================================
+membership_probe:
+  enabled: true
+  similarity_threshold: 0.70    # Below this = content not recoverable
+  probe_types:
+    - "direct_recall"
+    - "semantic"
+    - "adversarial"
+  max_probes_per_content: 20
+
+# ============================================================================
+# Benchmark Configurations
+# ============================================================================
+benchmarks:
+  # WMDP: Weapons of Mass Destruction Proxy (Li et al., 2024)
+  # 3,668 MCQ across biosecurity, cybersecurity, chemical security.
+  # Target: adapted model accuracy ≤ 25% (random) post-eviction.
+  wmdp:
+    source: "cais/wmdp"
+    subsets:
+      - "wmdp-bio"       # Biosecurity
+      - "wmdp-cyber"     # Cybersecurity
+      - "wmdp-chem"      # Chemical security
+    metric: "accuracy"
+    target_post_unlearning: 0.25  # Random chance for 4-choice MCQ
+
+  # TOFU: Task of Fictitious Unlearning (Maini et al., 2024)
+  # 200 fictitious author profiles.
+  tofu:
+    source: "locuslab/TOFU"
+    forget_ratio: 0.10           # Fraction of profiles to forget
+    metric: "model_utility"      # retain_accuracy / full_accuracy
+
+  # MUSE: Machine Unlearning Six-way Evaluation (Shi et al., 2024)
+  muse:
+    source: "muse-bench/MUSE"
+    dimensions:
+      - "verbatim_memorization"  # Can model reproduce exact text?
+      - "knowledge_manipulation" # Can model answer questions about content?
+      - "membership_inference"   # Can a classifier detect membership?
+      - "privacy_leakage"        # Does model leak private info?
+      - "utility"                # Is model still useful on other tasks?
+      - "fluency"                # Is output quality maintained?
+
+  # SafeRLHF: Safety alignment evaluation (Dai et al., 2024)
+  safe_rlhf:
+    source: "PKU-Alignment/PKU-SafeRLHF"
+    metric: "safety_score"
+    target_post_loading: 0.90    # Maintain >90% safety after adapter load
