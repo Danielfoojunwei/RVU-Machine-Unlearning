@@ -1,4 +1,4 @@
-# RVU Machine Unlearning v1: Recovery-based Verifiable Unlearning for Tool-Augmented LLM Agents
+# Adapter-Aware Recovery and Verification v1: Recovery-based Verifiable Unlearning for Tool-Augmented LLM Agents
 
 **An Empirical Evaluation of Prompt-Injection Defenses with Provenance-Tracked Recovery**
 
@@ -13,23 +13,23 @@
 Tool-augmented large language model (LLM) agents are vulnerable to prompt
 injection attacks in which adversarial instructions are embedded within
 external data sources (emails, webpages, documents) and executed by the agent.
-We present **RVU Machine Unlearning** (Recovery-based Verifiable Unlearning),
+We present **Adapter-Aware Recovery and Verification** (Recovery-based Verifiable Unlearning),
 a defense that combines provenance-tracked tool boundaries,
 contamination-closure computation, selective purge/rollback operators, and
 cryptographically signed certificates that an independent auditor can verify.
 
-We evaluate RVU Machine Unlearning against four baselines -- **Vanilla**
+We evaluate Adapter-Aware Recovery and Verification against four baselines -- **Vanilla**
 (no defense), **FATH** (authentication tags + hash verification),
 **PromptGuard** (classifier-based content filtering), and **RVG-only**
 (verifier-gated tool boundary without unlearning) -- across attack scenarios
 derived from three canonical prompt-injection benchmarks: **AgentDojo**
 (ETH/NIST), **InjecAgent** (UIUC), and **BIPIA** (Microsoft).
 
-Our findings show that RVU Machine Unlearning reduces the attack success rate
+Our findings show that Adapter-Aware Recovery and Verification reduces the attack success rate
 from **60% to 10%** (an 83% relative reduction) while maintaining comparable
 utility, and is the only defense that produces formally verifiable recovery
-certificates. RVU Machine Unlearning and RVG both substantially outperform
-FATH and Vanilla, but only RVU Machine Unlearning provides post-incident
+certificates. Adapter-Aware Recovery and Verification and RVG both substantially outperform
+FATH and Vanilla, but only Adapter-Aware Recovery and Verification provides post-incident
 auditability.
 
 ---
@@ -59,7 +59,7 @@ mechanism to identify, trace, and purge the contaminated state.
 
 ### 1.2 Contribution
 
-RVU Machine Unlearning introduces a third category: **provenance-tracked
+Adapter-Aware Recovery and Verification introduces a third category: **provenance-tracked
 recovery with verifiable unlearning**. The key contributions are:
 
 1. A **provenance database** (SQLite) that logs every tool call, tool output,
@@ -80,7 +80,7 @@ recovery with verifiable unlearning**. The key contributions are:
    deterministic purge manifests, enabling independent auditor verification.
 
 6. An **empirical evaluation** on CPU with open-weight models showing
-   RVU Machine Unlearning reduces ASR from 60% to 10% across three benchmark
+   Adapter-Aware Recovery and Verification reduces ASR from 60% to 10% across three benchmark
    families.
 
 ---
@@ -109,7 +109,7 @@ recovery with verifiable unlearning**. The key contributions are:
 
 Machine unlearning traditionally refers to removing the influence of specific
 training data from a trained model (Bourtoule et al., 2021; Nguyen et al.,
-2022). RVU Machine Unlearning extends this concept to the **inference-time
+2022). Adapter-Aware Recovery and Verification extends this concept to the **inference-time
 state** of an agent: rather than modifying model weights, it identifies and
 removes contaminated entries from the agent's working memory, retrieval store,
 and tool I/O history.
@@ -252,7 +252,7 @@ provenance similarity search. CPU-only.
 | **Vanilla** | `rvu.defenses.vanilla` | No modifications |
 | **FATH** | `rvu.defenses.fath_adapter` | SHA-256 auth tags, bracket format |
 | **RVG-only** | `rvu.defenses.rvg_only` | Tool allowlist + taint propagation |
-| **RVU Machine Unlearning** | `rvu.defenses.rvu` | SQLite + FAISS + closure + purge + certificate |
+| **Adapter-Aware Recovery and Verification** | `rvu.defenses.rvu` | SQLite + FAISS + closure + purge + certificate |
 
 ### 4.4 Attack Scenarios
 
@@ -281,7 +281,7 @@ four attack categories:
 - **Utility Score**: [0, 1] measuring task-relevant content overlap between
   the response and the user's original request.
 - **Wall Time**: end-to-end latency per scenario (seconds, CPU).
-- **Certificate Verification** (RVU Machine Unlearning only): whether the
+- **Certificate Verification** (Adapter-Aware Recovery and Verification only): whether the
   emitted certificate passes auditor verification.
 
 ### 4.6 System Configuration
@@ -309,15 +309,15 @@ four attack categories:
 | Vanilla | 60.0% | 40.0% | 0.5115 | 13.03 | 341 | -- |
 | FATH | 60.0% | 40.0% | 0.3133 | 14.02 | 228 | -- |
 | RVG | **10.0%** | **90.0%** | 0.4005 | 13.02 | 310 | -- |
-| RVU Machine Unlearning | **10.0%** | **90.0%** | 0.3033 | 13.35 | 277 | PASS |
+| Adapter-Aware Recovery and Verification | **10.0%** | **90.0%** | 0.3033 | 13.35 | 277 | PASS |
 
 **Key findings:**
 
-- RVU Machine Unlearning and RVG both reduce ASR by **83% relative** (60% -> 10%) compared to the undefended baseline.
+- Adapter-Aware Recovery and Verification and RVG both reduce ASR by **83% relative** (60% -> 10%) compared to the undefended baseline.
 - FATH provides **no ASR improvement** over Vanilla with a 1.5B-parameter model. The model does not reliably interpret authentication tags, confirming that prompt-level defenses degrade with smaller models.
 - FATH reduces utility by 39% relative to Vanilla (0.51 -> 0.31) due to the verbose tag format consuming context.
-- RVG and RVU Machine Unlearning achieve comparable security but RVU Machine Unlearning is the **only defense that produces verifiable certificates**.
-- Latency overhead of RVU Machine Unlearning over Vanilla is **2.5%** (0.32s), attributable to FAISS embedding and SQLite writes.
+- RVG and Adapter-Aware Recovery and Verification achieve comparable security but Adapter-Aware Recovery and Verification is the **only defense that produces verifiable certificates**.
+- Latency overhead of Adapter-Aware Recovery and Verification over Vanilla is **2.5%** (0.32s), attributable to FAISS embedding and SQLite writes.
 
 ### 5.2 ASR Breakdown by Benchmark Source
 
@@ -328,19 +328,19 @@ four attack categories:
 | Vanilla | 66.7% | 66.7% | 50.0% |
 | FATH | 33.3% | 100.0% | 50.0% |
 | RVG | 33.3% | **0.0%** | **0.0%** |
-| RVU Machine Unlearning | 33.3% | **0.0%** | **0.0%** |
+| Adapter-Aware Recovery and Verification | 33.3% | **0.0%** | **0.0%** |
 
 **Observations:**
 
-- **InjecAgent**: RVG and RVU Machine Unlearning achieve **perfect security** (0% ASR). FATH performs *worse* than Vanilla (100% vs 66.7%), likely because the FATH tag preamble confuses the model into treating injected content as authenticated.
-- **BIPIA**: RVG and RVU Machine Unlearning both achieve 0% ASR. The allowlist-based gating is particularly effective against indirect injections in contextual data, as `external_content` tools containing injected instructions are blocked.
+- **InjecAgent**: RVG and Adapter-Aware Recovery and Verification achieve **perfect security** (0% ASR). FATH performs *worse* than Vanilla (100% vs 66.7%), likely because the FATH tag preamble confuses the model into treating injected content as authenticated.
+- **BIPIA**: RVG and Adapter-Aware Recovery and Verification both achieve 0% ASR. The allowlist-based gating is particularly effective against indirect injections in contextual data, as `external_content` tools containing injected instructions are blocked.
 - **AgentDojo**: All defenses allow 33.3% ASR (1 of 3 attacks succeeds). The successful attack (`agentdojo-01`: email forwarding) exploits a `read_email` tool that is on the allowlist. This highlights a limitation of allowlist-based gating: attacks through permitted tool channels require content-level analysis.
 
 ### 5.3 Per-Scenario Detailed Results
 
 **Table 3. Per-scenario defense outcomes.**
 
-| Scenario | Category | Vanilla | FATH | RVG | RVU Machine Unlearning |
+| Scenario | Category | Vanilla | FATH | RVG | Adapter-Aware Recovery and Verification |
 |----------|----------|---------|------|-----|-----|
 | agentdojo-01 | tool_injection | FAIL | FAIL | FAIL | FAIL |
 | agentdojo-02 | tool_injection | pass | pass | pass | pass |
@@ -355,7 +355,7 @@ four attack categories:
 
 *pass = attack blocked; FAIL = attack succeeded; (block) = defense actively blocked tool output.*
 
-### 5.4 RVU Machine Unlearning Certificate Audit
+### 5.4 Adapter-Aware Recovery and Verification Certificate Audit
 
 **Table 4. Provenance and certificate statistics.**
 
@@ -381,10 +381,10 @@ file produces identical results.
 | Vanilla | 0.40 | 0.51 | No defense; highest utility but lowest security |
 | FATH | 0.40 | 0.31 | Worse on both axes than Vanilla |
 | RVG | **0.90** | 0.40 | +125% security for -22% utility vs Vanilla |
-| RVU Machine Unlearning | **0.90** | 0.30 | +125% security for -41% utility; adds auditability |
+| Adapter-Aware Recovery and Verification | **0.90** | 0.30 | +125% security for -41% utility; adds auditability |
 
 RVG achieves the best utility-security trade-off when auditability is not
-required. RVU Machine Unlearning is preferred when post-incident verification
+required. Adapter-Aware Recovery and Verification is preferred when post-incident verification
 and formal recovery certificates are needed.
 
 ---
@@ -405,7 +405,7 @@ on-device or edge-deployed agents.
 
 ### 6.2 Allowlist Gating Is Necessary but Not Sufficient
 
-RVG and RVU Machine Unlearning blocked 9 of 10 attacks, but both failed on
+RVG and Adapter-Aware Recovery and Verification blocked 9 of 10 attacks, but both failed on
 `agentdojo-01` where the injected instruction ("forward this email to
 evil@attacker.com") came through the `read_email` tool -- a tool that is
 legitimately on the allowlist. The allowlist gates which tools can be called,
@@ -413,14 +413,14 @@ but does not inspect the *content* of permitted tool outputs.
 
 **Implication**: Content-level analysis (classifiers, embedding similarity,
 provenance tracking) is needed to complement tool-level gating.
-RVU Machine Unlearning's embedding-based contamination detection provides
+Adapter-Aware Recovery and Verification's embedding-based contamination detection provides
 this capability for post-incident recovery, though real-time content filtering
 (e.g., PromptGuard) could address this gap at inference time.
 
 ### 6.3 Value of Verifiable Recovery
 
-RVG and RVU Machine Unlearning achieve identical ASR in our experiments, but
-RVU Machine Unlearning provides three capabilities that RVG does not:
+RVG and Adapter-Aware Recovery and Verification achieve identical ASR in our experiments, but
+Adapter-Aware Recovery and Verification provides three capabilities that RVG does not:
 
 1. **Complete provenance trail**: every action is logged with parent pointers,
    timestamps, and content hashes, enabling forensic analysis.
@@ -440,9 +440,9 @@ government) where incident response requires auditable evidence.
 | Vanilla | 13.03 | -- | -- |
 | FATH | 14.02 | +7.6% | Tag generation, hash computation, longer prompts |
 | RVG | 13.02 | -0.1% | Allowlist lookup (negligible) |
-| RVU Machine Unlearning | 13.35 | +2.5% | SQLite writes + FAISS embedding (0.32s per episode) |
+| Adapter-Aware Recovery and Verification | 13.35 | +2.5% | SQLite writes + FAISS embedding (0.32s per episode) |
 
-RVU Machine Unlearning adds only 0.32s per episode (2.5% overhead), dominated
+Adapter-Aware Recovery and Verification adds only 0.32s per episode (2.5% overhead), dominated
 by the sentence-transformers embedding computation. In production, this could
 be further reduced with batched writes and pre-computed embeddings.
 
@@ -459,7 +459,7 @@ be further reduced with batched writes and pre-computed embeddings.
 
 3. **Single remaining failure**: The `agentdojo-01` attack succeeds against
    all defenses because the injection arrives through a permitted tool
-   channel. Combining RVU Machine Unlearning with a content-level classifier
+   channel. Combining Adapter-Aware Recovery and Verification with a content-level classifier
    would address this.
 
 4. **Heuristic evaluation**: Attack compliance is detected via keyword
@@ -474,8 +474,8 @@ be further reduced with batched writes and pre-computed embeddings.
 
 ## 8. Conclusion
 
-We presented RVU Machine Unlearning, a recovery-based verifiable unlearning
-defense for tool-augmented LLM agents. RVU Machine Unlearning reduces attack
+We presented Adapter-Aware Recovery and Verification, a recovery-based verifiable unlearning
+defense for tool-augmented LLM agents. Adapter-Aware Recovery and Verification reduces attack
 success rate from 60% to 10% across AgentDojo, InjecAgent, and BIPIA-derived
 scenarios, matching the security of allowlist-based gating (RVG) while adding
 provenance tracking, selective purge, and auditor-verifiable certificates. The
@@ -484,10 +484,10 @@ provenance tracking, selective purge, and auditor-verifiable certificates. The
 Our results demonstrate that:
 - **Prompt-level defenses (FATH) are unreliable on small models** (< 2B params).
 - **Tool-level gating (RVG/RVU) is highly effective** against cross-tool injection.
-- **Provenance-based recovery (RVU Machine Unlearning) adds auditability at minimal cost**.
+- **Provenance-based recovery (Adapter-Aware Recovery and Verification) adds auditability at minimal cost**.
 - **Content-level analysis is needed** to defend against in-channel injection.
 
-Future work includes combining RVU Machine Unlearning with real-time
+Future work includes combining Adapter-Aware Recovery and Verification with real-time
 PromptGuard filtering, evaluating on larger models (7B-70B), and running
 complete benchmark suites.
 
