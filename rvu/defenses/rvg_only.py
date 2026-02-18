@@ -5,7 +5,7 @@ against the allowlist; outputs from disallowed tools are blocked.  Taint
 propagation is tracked: if a tool output is tainted, downstream uses
 inherit the taint.
 
-This defense does NOT perform unlearning -- it is a pure gating layer.
+This defense does NOT perform state recovery -- it is a pure gating layer.
 """
 
 from __future__ import annotations

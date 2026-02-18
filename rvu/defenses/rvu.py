@@ -1,4 +1,4 @@
-"""Full RVU (Recovery-based Verifiable Unlearning) defense implementation.
+"""Full RVU (Recovery and Verification Utility) defense implementation.
 
 Combines:
 * **Provenance tracking** -- SQLite database logging all tool I/O, memory
@@ -61,7 +61,7 @@ CREATE TABLE IF NOT EXISTS provenance (
 
 
 class RVUDefense(BaseDefense):
-    """Full Recovery-based Verifiable Unlearning defense.
+    """Full Recovery and Verification Utility defense.
 
     Parameters
     ----------
@@ -585,7 +585,7 @@ class RVUDefense(BaseDefense):
             "RVU PROVENANCE TRACKING ACTIVE.\n"
             "All inputs, tool calls, and outputs are logged with cryptographic "
             "hashes for auditability. Contamination detection and verifiable "
-            "unlearning are enabled. Do not attempt to circumvent provenance "
+            "state recovery are enabled. Do not attempt to circumvent provenance "
             "tracking.\n"
         )
 
